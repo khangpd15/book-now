@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(title='Booking History - BookNow')}"></head>
+<style>
+    .scrollbar-thin::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .room-column {
+        min-width: 200px;
+        width: 200px;
+    }
+
+    table {
+        table-layout: fixed;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .scroll-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .logo-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 25px;
+        margin-left: 25px;
+        z-index: 60;
+    }
+
+    .hero-bg {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        height: 550px;
+    }
+
+    .dropdown-menu {
+        transform-origin: top right;
+        transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+    }
+
+    .dropdown-hidden {
+        transform: scale(0.95);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .dropdown-visible {
+        transform: scale(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .slot-btn.selected {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+</style>
+
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+
+<div th:replace="~{fragments/navbar :: public-navbar}"></div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-14">
+
+    <!-- Page Header -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Lịch sử đặt phòng</h1>
+            <p class="text-sm text-gray-500 mt-1">Theo dõi và quản lý tất cả các đặt chỗ của bạn.</p>
+        </div>
+
+    </div>
+
+    <!-- ===== TABLE CARD ===== -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+        <!-- Table -->
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left min-w-[900px]">
+                <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th class="px-5 py-4">Booking Code</th>
+                    <th class="px-5 py-4">Room</th>
+                    <th class="px-5 py-4">Room Type</th>
+                    <th class="px-5 py-4">Check-in</th>
+                    <th class="px-5 py-4">Check-out</th>
+                    <th class="px-5 py-4 text-right">Total</th>
+                    <th class="px-5 py-4 text-center">Booking Status</th>
+                    <th class="px-5 py-4 text-center">Action</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                <!-- ===================================================
+                                    EMPTY STATE — shown when bookings list is empty
+                                    ===================================================-->
+                <tr th:if="${bookings == null or #lists.isEmpty(bookings)}">
+                    <td colspan="9" class="px-5 py-20 text-center">
+                        <div class="flex flex-col items-center gap-3 text-gray-400">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                <i class="fa-regular fa-calendar-xmark text-2xl text-gray-300"></i>
+                            </div>
+                            <p class="font-semibold text-gray-500">Hiện không có đặt phòng</p>
+                            <p class="text-sm">Bạn chưa đặt phòng nào.</p>
+                            <a th:href="@{/home}" href="index.html"
+                               class="mt-2 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i> Tìm phòng ngay
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <!-- ===================================================
+                     THYMELEAF: Dynamic rows — rendered by Spring Boot
+                     Model: List<Booking> bookings (with room, roomType, payment loaded)
+                     ===================================================-->
+                <tr th:unless="${bookings == null or #lists.isEmpty(bookings)}" th:each="booking : ${bookings}"
+                    class="hover:bg-blue-50/40 transition-colors">
+
+                    <!-- Booking Code -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="font-mono text-sm font-bold text-gray-700"
+                                      th:text="${booking.bookingCode}">BK20260312001</span>
+                    </td>
+
+                    <!-- Room Number -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-800"
+                                      th:text="${booking.room.roomNumber}">Room 101</span>
+                    </td>
+
+                    <!-- Room Type -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-600"
+                                      th:text="${booking.room.roomType.name}">Deluxe Double</span>
+                    </td>
+
+                    <!-- Check-in Date -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-700"
+                                      th:text="${booking.getCheckInDate()}">12 Mar 2026</span>
+                    </td>
+
+                    <!-- Check-out Date -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-700"
+                                      th:text="${booking.getCheckOutDate()}">15 Mar 2026</span>
+                    </td>
+
+                    <!-- Total Amount -->
+                    <td class="px-5 py-4 whitespace-nowrap text-right">
+                                <span class="text-sm font-semibold text-gray-900"
+                                      th:text="${booking.getTotalAmountVND()}">$240.00</span>
+                    </td>
+
+                    <!-- Booking Status Badge -->
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                                <span th:if="${booking.bookingStatus.name() == 'PENDING_PAYMENT'}"
+                                      class="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 border border-orange-200">
+                                    Chờ thanh toán
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'PAID'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                                    Chờ kiểm duyệt
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'APPROVED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
+                                    Đã kiểm duyệt
+                                </span><span th:if="${booking.bookingStatus.name() == 'CHECKED_IN'}"
+                                             class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
+                                    Đã check-in
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'CHECKED_OUT'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700 border border-teal-200">
+                                    Đã check out
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'COMPLETED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                                    Hoàn thành
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'CANCELED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    Đã hủy
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'FAILED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    Thất bại
+                                </span>
+                        <span th:if="${booking.bookingStatus.name() == 'REJECTED'}"
+                              class="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+                                    Từ chối
+                                </span>
+                    </td>
+                    <!-- Action -->
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <a th:href="@{/bookings/{id}(id=${booking.bookingId})}"
+                           href="booking-detail.html"
+                           class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fa-regular fa-eye text-xs"></i> View
+                        </a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== PAGINATION ===== -->
+        <!-- We check totalPages > 1 to ensure pagination is actually needed -->
+        <!-- ===== PAGINATION ===== -->
+        <div th:if="${totalPages != null and totalPages > 0}"
+             class="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
+
+            <!-- Display Showing X - Y of Z -->
+            <span class="text-xs text-gray-500"
+                  th:text="${'Showing ' + (totalItems == 0 ? 0 : startIndex + 1) + ' – ' + endIndex + ' of ' + totalItems + ' bookings'}">
+        Showing 1 – 6 of 24 bookings
+    </span>
+
+            <div class="flex gap-1" th:if="${totalPages > 0}">
+                <!-- Previous Button (Disabled on first page) -->
+                <a th:if="${currentPage > 1}"
+                   th:href="@{''(page=${currentPage - 1})}"
+                   class="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </a>
+                <span th:if="${currentPage <= 1}"
+                      class="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300 cursor-not-allowed">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </span>
+
+                <!-- Page Numbers: Sequence specifically from 1 to totalPages -->
+                <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                    <a th:href="@{''(page=${i})}"
+                       th:text="${i}"
+                       th:class="${i == currentPage}
+                    ? 'w-8 h-8 rounded bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-sm'
+                    : 'w-8 h-8 rounded border border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600 text-xs flex items-center justify-center transition-colors'">
+                        1
+                    </a>
+                </th:block>
+
+                <!-- Next Button (Disabled on last page) -->
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{''(page=${currentPage + 1})}"
+                   class="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </a>
+                <span th:if="${currentPage >= totalPages}"
+                      class="w-8 h-8 rounded border border-gray-100 flex items-center justify-center text-gray-300 cursor-not-allowed">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </span>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div th:replace="~{fragments/navbar :: dropdown-script}"></div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
