@@ -360,6 +360,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SCRIPT -->
     <script th:inline="javascript">
+        // Build dynamic base URL
+        const protocol = window.location.protocol;
+        const host = window.location.host;
+        const baseUrl = protocol + '//' + host + '/book-now';
 
         document.addEventListener("DOMContentLoaded", function () {
 
@@ -563,7 +567,7 @@
                 const from = document.getElementById("drp-from").value;
                 const to = document.getElementById("drp-to").value;
                 console.log("Day la type ne:" + type);
-                const url = "http://localhost:8080/book-now/admin/dashboard/export/" +
+                const url = baseUrl + '/admin/dashboard/export/' +
                     type +
                     "?startDate=" + from +
                     "&endDate=" + to;

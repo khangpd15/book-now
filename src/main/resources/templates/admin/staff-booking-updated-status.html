@@ -746,7 +746,12 @@
     mobileMenuBtn?.addEventListener('click', toggleSidebar);
     sidebarOverlay?.addEventListener('click', toggleSidebar);
 
-    const socket = new SockJS(/*[[@{/ws}]]*/ 'http://localhost:8080/book-now/ws');
+    // Build dynamic base URL
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    const baseUrl = protocol + '//' + host + '/book-now';
+
+    const socket = new SockJS(baseUrl + '/ws');
     const stompClient = Stomp.over(socket);
 
 
@@ -801,7 +806,7 @@
 
     function approve() {
         console.log("running....");
-        fetch(/*[[@{/checkin/approve}]]*/ "http://localhost:8080/book-now/checkin/approve", {
+        fetch(baseUrl + '/checkin/approve', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -830,7 +835,7 @@
     }
 
     function reject(bookingId) {
-        fetch(/*[[@{/checkin/reject}]]*/ "http://localhost:8080/book-now/checkin/reject", {
+        fetch(baseUrl + '/checkin/reject', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

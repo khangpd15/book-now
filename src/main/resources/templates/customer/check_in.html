@@ -19,8 +19,12 @@
 
 
 <script>
+    // Build dynamic base URL
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    const baseUrl = protocol + '//' + host + '/book-now';
 
-    const socket = new SockJS(/*[[@{/ws}]]*/ 'http://localhost:8080/book-now/ws');
+    const socket = new SockJS(baseUrl + '/ws');
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
@@ -34,10 +38,10 @@
             alert(data.message);
             switch (data.bookingStatus) {
                 case 'REJECTED_CHECKIN':
-                    window.location.href = /*[[@{/checkin/fail}]]*/ "http://localhost:8080/book-now/checkin/fail";
+                    window.location.href = baseUrl + '/checkin/fail';
                     break;
                 case 'CHECKED_IN':
-                    window.location.href = /*[[@{/checkin/success}]]*/ "http://localhost:8080/book-now/checkin/success" + "?bookingId=" + bookingId;
+                    window.location.href = baseUrl + '/checkin/success' + "?bookingId=" + bookingId;
                     break;
             }
 
@@ -109,7 +113,7 @@
         formData.append("bookingId", bookingId);
 
         try {
-            const response = await fetch(/*[[@{/checkin/start}]]*/ "http://localhost:8080/book-now/checkin/start", {
+            const response = await fetch(baseUrl + '/checkin/start', {
                 method: "POST",
                 body: formData
             });
