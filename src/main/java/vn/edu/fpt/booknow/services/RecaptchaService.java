@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-@Service
+//@Service
 public class RecaptchaService {
 
     @Value("${google.recaptcha.secret}")

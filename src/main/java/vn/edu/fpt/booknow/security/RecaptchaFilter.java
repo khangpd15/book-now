@@ -11,7 +11,7 @@ import vn.edu.fpt.booknow.services.RecaptchaService;
 
 import java.io.IOException;
 
-@Component
+//@Component
 public class RecaptchaFilter extends OncePerRequestFilter {
 
     @Autowired
