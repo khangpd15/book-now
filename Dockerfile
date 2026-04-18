@@ -6,5 +6,5 @@ COPY . .
 
 RUN mvn clean package -DskipTests
 
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "target/book-now-1.0-SNAPSHOT.jar"]
 
