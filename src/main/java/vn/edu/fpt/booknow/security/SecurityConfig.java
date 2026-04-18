@@ -39,9 +39,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService detailsService;
-
-    @Autowired
-    private RecaptchaFilter recaptchaFilter;
+//
+//    @Autowired
+//    private RecaptchaFilter recaptchaFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -73,7 +73,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -121,7 +121,7 @@ public class SecurityConfig {
                         }))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(recaptchaFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
